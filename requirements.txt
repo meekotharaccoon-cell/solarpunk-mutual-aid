@@ -1,0 +1,3 @@
+# SolarPunk Mutual Aid -- dependencies
+# All stdlib. No external packages required.
+# This file exists for CI compatibility and future expansion.
