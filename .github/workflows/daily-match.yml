@@ -1,0 +1,40 @@
+name: Daily Mutual Aid Matching
+
+on:
+  schedule:
+    - cron: "0 13 * * *"   # 13:00 UTC daily
+  workflow_dispatch:        # manual trigger
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  match-and-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run mutual aid agent
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MUTUAL_AID_REPO: ${{ github.repository }}
+          POST_ISSUES: "true"
+        run: python agent/aid_agent.py
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutual-aid-report
+          path: data/reports/
+          retention-days: 30
